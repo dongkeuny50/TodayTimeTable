@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:id="@+id/LinearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="@drawable/time_minute_text"
+    android:weightSum="15">
+
+    <EditText
+        android:id="@+id/time"
+        android:layout_width="70dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:background="@android:color/transparent"
+        android:ems="10"
+
+        android:layout_marginEnd="10dp"
+        android:gravity="center_vertical|right"
+        android:hint="시"
+        android:inputType="textPersonName" />
+
+    <TextView
+        android:id="@+id/column"
+        android:layout_width="20dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_weight="1"
+
+
+        android:background="@android:color/transparent"
+        android:text=":" />
+
+    <EditText
+        android:id="@+id/minute"
+        android:layout_width="70dp"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical|left"
+        android:layout_weight="2"
+        android:background="@android:color/transparent"
+        android:ems="10"
+        android:layout_marginStart="10dp"
+        android:hint="분"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/textlines"
+        android:layout_width="214dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight="10"
+        android:background="@drawable/textinput"
+
+        android:ems="10"
+        android:hint="내용"
+        android:inputType="textMultiLine"
+        android:textAlignment="center" />
+</LinearLayout>

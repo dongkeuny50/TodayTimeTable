@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">TodayTimeTable</string>
+    <string name="timetable">시간표</string>
+    <string name="repository">저장소</string>
+    <string name="setting">설정</string>
+    <string name="todo">TODO</string>
+</resources>
