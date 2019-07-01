@@ -40,6 +40,10 @@ public class PlaceholderFragment extends Fragment {
 View root;
 View view;
     ArrayList<String> list;
+    String jh = "";
+    String jm = "";
+    String jt = "";
+    ArrayList<String> hm = new ArrayList<String>();
     static PlaceholderFragment newInstance() {
         PlaceholderFragment fragment = new PlaceholderFragment();
         Bundle bundle = new Bundle();
@@ -165,15 +169,17 @@ View view;
                 String jhour = "";
                 String jminute = "";
                 String jtextline = "";
+                ArrayList<String> hmt = new ArrayList<String>();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 Date date = new Date(System.currentTimeMillis());
                 String getTime = sdf.format(date);
-                ArrayList<String> hmt = new ArrayList<String>();
                     try {
                         SharedPreferences sharedPreferences = root.getContext().getSharedPreferences("pref",MODE_PRIVATE);
                         str = sharedPreferences.getString(getTime,"");
+
                         JSONArray jarray = new JSONArray(str); // JSONArray 생성
                         for(int i=0; i < jarray.length(); i++){
+
                             JSONObject jObject = jarray.getJSONObject(i);  // JSONObject 추출
                             jhour = jObject.getString("hour");
                             jminute = jObject.getString("minute");
@@ -182,33 +188,46 @@ View view;
                             hmt.add(jminute);
                             hmt.add(jtextline);
                         }
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                Toast.makeText(root.getContext(), Integer.toString(list.size()), Toast.LENGTH_SHORT).show();
-                for(int i=0;i < list.size();i++) {
-                    View view = recyclerView.findViewHolderForAdapterPosition(i).itemView;
-                    EditText hour = view.findViewById(R.id.time);
-                    EditText minute = view.findViewById(R.id.minute);
-                    EditText textinput = view.findViewById(R.id.textlines);
-                    jhour = hmt.get(i*3);
-                    jminute = hmt.get(i*3+1);
-                    jtextline= hmt.get(i*3+2);
-
-                    hour.setText(jhour);
-                    minute.setText(jminute);
-                    textinput.setText(jtextline);
+                list.clear();
+                adapter.notifyDataSetChanged();
+                for(int i=0;i<hmt.size()/3;i++) {
+                    list.add("");
+                    adapter.notifyItemInserted(list.size());
                 }
+                hm = hmt;
+                jh = "";
+                jm = "";
+                jt = "";
+                recyclerView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < list.size(); i++) {
+                            View view = recyclerView.findViewHolderForAdapterPosition(i).itemView;
+                            EditText hour = view.findViewById(R.id.time);
+                            EditText minute = view.findViewById(R.id.minute);
+                            EditText textinput = view.findViewById(R.id.textlines);
+                            jh = hm.get(i * 3);
+                            jm = hm.get(i * 3 + 1);
+                            jt = hm.get(i * 3 + 2);
+
+                            hour.setText(jh);
+                            minute.setText(jm);
+                            textinput.setText(jt);
+                        }
+
+                    }
+                },50);
+
 
                 adapter.notifyDataSetChanged();
-
-
-
-
-
+                Toast.makeText(root.getContext(), "불러오기 성공", Toast.LENGTH_SHORT).show();
             }
-        });
 
+        });
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             public boolean onMove(RecyclerView recyclerView,
                                   RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
