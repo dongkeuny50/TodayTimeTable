@@ -43,11 +43,13 @@ View view;
     String jh = "";
     String jm = "";
     String jt = "";
+    ArrayList<String> when = new ArrayList<>();
     ArrayList<String> hm = new ArrayList<String>();
     static PlaceholderFragment newInstance() {
         PlaceholderFragment fragment = new PlaceholderFragment();
         Bundle bundle = new Bundle();
         bundle.putInt(ARG_SECTION_NUMBER, 0);
+
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -61,6 +63,7 @@ View view;
         int index = 1;
         if (getArguments() != null) {
             index = getArguments().getInt(ARG_SECTION_NUMBER);
+            when = (ArrayList<String>)getArguments().get("list");
         }
         pageViewModel.setIndex(index);
     }
@@ -105,9 +108,15 @@ View view;
                     textinput.setText("");
 
                 }
+recyclerView.postDelayed(new Runnable() {
+    @Override
+    public void run() {
+        for(int i=list.size()-1;i >=0 ;i--){
+            list.remove(i);
+        }
 
-              list.clear();
-              adapter.notifyDataSetChanged();
+    }
+},50);
             }
         });
         Button textdeletebutton = root.findViewById(R.id.text_delete);
@@ -138,60 +147,38 @@ View view;
         textsavebutton.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View v){
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date date = new Date(System.currentTimeMillis());
-                String getTime = sdf.format(date);
+                recyclerView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        Date date = new Date(System.currentTimeMillis());
+                        String getTime = sdf.format(date);
 
-                String savedString = "[";
-                for(int i=0;i < list.size();i++) {
+                        String savedString = "[";
+                        for(int i=0;i < list.size();i++) {
 
-                    View view = recyclerView.findViewHolderForAdapterPosition(i).itemView;
+                            View view = recyclerView.findViewHolderForAdapterPosition(i).itemView;
 
-                    EditText hour = view.findViewById(R.id.time);
-                    EditText minute = view.findViewById(R.id.minute);
-                    EditText textinput = view.findViewById(R.id.textlines);
-                    savedString += "{'hour':'" +hour.getText().toString()+"','minute':'"+ minute.getText().toString()+"','textlines':'" + textinput.getText().toString()+"'},";
-                }
-                savedString += "]";
-                SharedPreferences sharedPreferences =root.getContext().getSharedPreferences("pref", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(getTime,savedString);
-                editor.commit();
-                Toast.makeText(root.getContext(), getTime + "날짜로 저장되었습니다.", Toast.LENGTH_SHORT).show();
+                            EditText hour = view.findViewById(R.id.time);
+                            EditText minute = view.findViewById(R.id.minute);
+                            EditText textinput = view.findViewById(R.id.textlines);
+                            savedString += "{'hour':'" +hour.getText().toString()+"','minute':'"+ minute.getText().toString()+"','textlines':'" + textinput.getText().toString()+"'},";
+                        }
+                        savedString += "]";
+                        SharedPreferences sharedPreferences =root.getContext().getSharedPreferences("pref", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString(getTime,savedString);
+                        editor.commit();
+                        Toast.makeText(root.getContext(), getTime + "날짜로 저장되었습니다.", Toast.LENGTH_SHORT).show();
 
+
+                    }
+                },50);
             }
         });
-        Button textloadbutton = root.findViewById(R.id.load);
-        textloadbutton.setOnClickListener(new Button.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                String str = "";
-                String jhour = "";
-                String jminute = "";
-                String jtextline = "";
-                ArrayList<String> hmt = new ArrayList<String>();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date date = new Date(System.currentTimeMillis());
-                String getTime = sdf.format(date);
-                    try {
-                        SharedPreferences sharedPreferences = root.getContext().getSharedPreferences("pref",MODE_PRIVATE);
-                        str = sharedPreferences.getString(getTime,"");
 
-                        JSONArray jarray = new JSONArray(str); // JSONArray 생성
-                        for(int i=0; i < jarray.length(); i++){
+        if(when.size() != 0){
 
-                            JSONObject jObject = jarray.getJSONObject(i);  // JSONObject 추출
-                            jhour = jObject.getString("hour");
-                            jminute = jObject.getString("minute");
-                            jtextline = jObject.getString("textlines");
-                            hmt.add(jhour);
-                            hmt.add(jminute);
-                            hmt.add(jtextline);
-                        }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
                 list.clear();
                 adapter.notifyDataSetChanged();
                 for(int i=0;i<hmt.size()/3;i++) {
@@ -226,8 +213,6 @@ View view;
                 adapter.notifyDataSetChanged();
                 Toast.makeText(root.getContext(), "불러오기 성공", Toast.LENGTH_SHORT).show();
             }
-
-        });
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             public boolean onMove(RecyclerView recyclerView,
                                   RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
