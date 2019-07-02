@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
+import java.util.ArrayList;
+
 public class PageViewModel extends ViewModel {
 
     private MutableLiveData<Integer> mIndex = new MutableLiveData<>();
@@ -15,12 +17,20 @@ public class PageViewModel extends ViewModel {
             return "Hello world from section: " + input;
         }
     });
+    private MutableLiveData<ArrayList<String>> lists = new MutableLiveData<>();
 
     public void setIndex(int index) {
         mIndex.setValue(index);
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public void setLists(ArrayList<String> arr){
+        lists.postValue(arr);
+
     }
+    public LiveData<ArrayList<String>> getlists = Transformations.map(lists, new Function<ArrayList<String>, ArrayList<String>>() {
+        @Override
+        public ArrayList<String> apply(ArrayList<String> input) {
+            return input;
+        }
+    });
 }
