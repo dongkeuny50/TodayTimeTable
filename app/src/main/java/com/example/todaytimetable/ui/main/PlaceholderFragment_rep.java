@@ -15,6 +15,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -60,7 +62,7 @@ String finalword = "";
             Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_rep, container, false);
         Button button = (Button)root.findViewById(R.id.load);
-        CalendarView calendarView = (CalendarView)root.findViewById(R.id.calendarView);
+        CalendarView calendarView = (CalendarView)root.findViewById(R.id.calenderView);
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
 
             @Override
@@ -81,7 +83,6 @@ String finalword = "";
                 SharedPreferences spf = root.getContext().getSharedPreferences("pref",MODE_PRIVATE);
                 words = spf.getString(finalword,"");
 
-                    Toast.makeText(root.getContext(), finalword + " 불러오기 성공", Toast.LENGTH_SHORT).show();
                 JSONArray jarray = new JSONArray(words); // JSONArray 생성
                     for(int i=0; i < jarray.length()-1; i++){
 
@@ -96,6 +97,8 @@ String finalword = "";
 
                     pageViewModel.setLists(hmt);
                     pageViewModel.setDate(finalword);
+                    Toast.makeText(root.getContext(), finalword + " 불러오기 성공", Toast.LENGTH_SHORT).show();
+
                 } catch (JSONException e) {
                     pageViewModel.setLists(new ArrayList<String>());
                     pageViewModel.setDate(finalword);

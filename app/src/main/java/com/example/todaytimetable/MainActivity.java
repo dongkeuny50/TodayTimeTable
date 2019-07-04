@@ -1,6 +1,8 @@
 package com.example.todaytimetable;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.example.todaytimetable.ui.main.PageViewModel;
@@ -24,14 +26,18 @@ import android.widget.Toast;
 
 import com.example.todaytimetable.ui.main.SectionsPagerAdapter;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     PageViewModel pageViewModel;
+    String date = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
@@ -42,9 +48,16 @@ public class MainActivity extends AppCompatActivity {
         pageViewModel.getdate.observe(this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
-                textView.setText(s + " 오늘의 할일");
+                date = s;
+                textView.setText(date + " 오늘의 할일");
             }
         });
+        if(date==""){
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d");
+                Date Today = new Date(System.currentTimeMillis());
+                date = sdf.format(Today);
+                textView.setText(date + "오늘의 할일");
+        }
         /*
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

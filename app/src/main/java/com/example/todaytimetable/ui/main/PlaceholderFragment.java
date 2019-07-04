@@ -43,13 +43,18 @@ View view;
     String date = "";
     private String getTime;
     private ArrayList<String> hm = new ArrayList<String>();
+    RecyclerView recyclerView;
+    recyclerview adapter;
 
-
-
+    static PlaceholderFragment newInstance(int index) {
+        PlaceholderFragment fragment = new PlaceholderFragment();
+        return fragment;
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pageViewModel = ViewModelProviders.of(getActivity()).get(PageViewModel.class);
+
 
     }
 
@@ -60,11 +65,11 @@ View view;
             Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_main, container, false);
         // 리사이클러뷰에 표시할 데이터 리스트 생성.
-        list= new ArrayList<>();
         // 리사이클러뷰에 LinearLayoutManager 객체 지정.
-        final RecyclerView recyclerView = root.findViewById(R.id.recycler) ;
+        recyclerView = root.findViewById(R.id.recycler) ;
+        list= new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(root.getContext())) ;
-        final recyclerview adapter = new recyclerview(list) ;
+        adapter = new recyclerview(list) ;
         recyclerView.setAdapter(adapter) ;
         if(strarray.size() != 0){
         Toast.makeText(root.getContext(), strarray.get(0), Toast.LENGTH_SHORT).show();}
@@ -85,19 +90,26 @@ View view;
                     @Override
                     public void run() {
                         for(int i=0;i < list.size();i++){
-                            View view = recyclerView.findViewHolderForAdapterPosition(i).itemView;
-
-                            EditText hour = view.findViewById(R.id.time);
-                            EditText minute = view.findViewById(R.id.minute);
-                            EditText textinput = view.findViewById(R.id.textlines);
-                            hour.setText("");
-                            minute.setText("");
-                            textinput.setText("");
-
+                            RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder)
+                                    recyclerView.findViewHolderForAdapterPosition(i);
+                            if (null != holder) {
+                                holder.itemView.setVisibility(View.VISIBLE);
+                                holder.itemView.findViewById(R.id.time).setVisibility(View.VISIBLE);
+                                holder.itemView.findViewById(R.id.minute).setVisibility(View.VISIBLE);
+                                holder.itemView.findViewById(R.id.textlines).setVisibility(View.VISIBLE);
+                                View view = holder.itemView;
+                                EditText hour = view.findViewById(R.id.time);
+                                EditText minute = view.findViewById(R.id.minute);
+                                EditText textinput = view.findViewById(R.id.textlines);
+                                hour.setText("");
+                                minute.setText("");
+                                textinput.setText("");
+                            }
+                            adapter.notifyDataSetChanged();
                         }
 
                     }
-                },200);
+                },100);
 
 recyclerView.postDelayed(new Runnable() {
     @Override
@@ -108,13 +120,14 @@ recyclerView.postDelayed(new Runnable() {
         }
 
     }
-},100);
+},200);
             }
         });
         Button textdeletebutton = root.findViewById(R.id.text_delete);
         textdeletebutton.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View v){
+                adapter.notifyDataSetChanged();
                 for(int i=0;i < list.size();i++){
                     View view = recyclerView.findViewHolderForAdapterPosition(i).itemView;
 
@@ -139,6 +152,7 @@ recyclerView.postDelayed(new Runnable() {
         textsavebutton.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View v){
+                adapter.notifyDataSetChanged();
                 recyclerView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -153,22 +167,27 @@ recyclerView.postDelayed(new Runnable() {
 
 
                         for (int i = 0; i < list.size(); i++) {
-                            if(recyclerView.findViewHolderForAdapterPosition(i)==null )
-                            {Toast.makeText(root.getContext(), "로딩중입니다. 기다려 주세요.", Toast.LENGTH_SHORT).show();
-                            break;
+                            RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder)
+                                    recyclerView.findViewHolderForAdapterPosition(i);
+                            if (null != holder) {
+                                holder.itemView.setVisibility(View.VISIBLE);
+                                holder.itemView.findViewById(R.id.time).setVisibility(View.VISIBLE);
+                                holder.itemView.findViewById(R.id.minute).setVisibility(View.VISIBLE);
+                                holder.itemView.findViewById(R.id.textlines).setVisibility(View.VISIBLE);
+                                View view = holder.itemView;
+                                EditText hour = view.findViewById(R.id.time);
+                                EditText minute = view.findViewById(R.id.minute);
+                                EditText textinput = view.findViewById(R.id.textlines);
+                                savedString[0] += "{'hour':'" + hour.getText().toString() + "','minute':'" + minute.getText().toString() + "','textlines':'" + textinput.getText().toString() + "'},";
                             }
-                            View view = recyclerView.findViewHolderForAdapterPosition(i).itemView;
-                            EditText hour = view.findViewById(R.id.time);
-                            EditText minute = view.findViewById(R.id.minute);
-                            EditText textinput = view.findViewById(R.id.textlines);
-                            savedString[0] += "{'hour':'" + hour.getText().toString() + "','minute':'" + minute.getText().toString() + "','textlines':'" + textinput.getText().toString() + "'},";
                         }
                         savedString[0] += "]";
                         SharedPreferences sharedPreferences = root.getContext().getSharedPreferences("pref", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString(getTime, savedString[0]);
+                        editor.putString("date",getTime);
                         editor.commit();
-                        Toast.makeText(root.getContext(), date + "날짜로 저장되었습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(root.getContext(), getTime + "날짜로 저장되었습니다.", Toast.LENGTH_SHORT).show();
 
                     }
                     },200);
