@@ -33,4 +33,14 @@ public class PageViewModel extends ViewModel {
             return input;
         }
     });
+    private MutableLiveData<String> date = new MutableLiveData<>();
+   public LiveData<String> getdate = Transformations.map(date, new Function<String, String>() {
+        @Override
+        public String apply(String input) {
+            return input;
+        }
+    });
+    public void setDate(String str){
+        date.postValue(str);
+    }
 }

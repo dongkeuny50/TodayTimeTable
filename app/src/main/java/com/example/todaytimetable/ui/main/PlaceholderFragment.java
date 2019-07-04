@@ -2,7 +2,6 @@ package com.example.todaytimetable.ui.main;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,21 +11,14 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.todaytimetable.MainActivity;
 import com.example.todaytimetable.R;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,16 +31,18 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public class PlaceholderFragment extends Fragment {
 
-    PageViewModel pageViewModel;
-    ArrayList<String> when = new ArrayList<String>();
+    private PageViewModel pageViewModel;
+    private ArrayList<String> strarray = new ArrayList<String>();
     private static final String ARG_SECTION_NUMBER = "section_number";
-View root;
+private View root;
 View view;
-    ArrayList<String> list;
-    String jh = "";
-    String jm = "";
-    String jt = "";
-    ArrayList<String> hm = new ArrayList<String>();
+    private ArrayList<String> list;
+    private String jh = "";
+    private String jm = "";
+    private String jt = "";
+    String date = "";
+    private String getTime;
+    private ArrayList<String> hm = new ArrayList<String>();
 
 
 
@@ -72,8 +66,8 @@ View view;
         recyclerView.setLayoutManager(new LinearLayoutManager(root.getContext())) ;
         final recyclerview adapter = new recyclerview(list) ;
         recyclerView.setAdapter(adapter) ;
-        if(when.size() != 0){
-        Toast.makeText(root.getContext(), when.get(0), Toast.LENGTH_SHORT).show();}
+        if(strarray.size() != 0){
+        Toast.makeText(root.getContext(), strarray.get(0), Toast.LENGTH_SHORT).show();}
 
         Button create = root.findViewById(R.id.create);
         create.setOnClickListener(new Button.OnClickListener(){
@@ -148,40 +142,53 @@ recyclerView.postDelayed(new Runnable() {
                 recyclerView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d");
-                        Date date = new Date(System.currentTimeMillis());
-                        String getTime = sdf.format(date);
+                        final String[] savedString = new String[1];
+                        if(date == "") {
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d");
+                            Date date = new Date(System.currentTimeMillis());
+                            getTime = sdf.format(date);
+                        }
+                        else{getTime = date;}
+                        savedString[0] = "[";
 
-                        String savedString = "[";
-                        for(int i=0;i < list.size();i++) {
 
+                        for (int i = 0; i < list.size(); i++) {
+                            if(recyclerView.findViewHolderForAdapterPosition(i)==null )
+                            {Toast.makeText(root.getContext(), "로딩중입니다. 기다려 주세요.", Toast.LENGTH_SHORT).show();
+                            break;
+                            }
                             View view = recyclerView.findViewHolderForAdapterPosition(i).itemView;
-
                             EditText hour = view.findViewById(R.id.time);
                             EditText minute = view.findViewById(R.id.minute);
                             EditText textinput = view.findViewById(R.id.textlines);
-                            savedString += "{'hour':'" +hour.getText().toString()+"','minute':'"+ minute.getText().toString()+"','textlines':'" + textinput.getText().toString()+"'},";
+                            savedString[0] += "{'hour':'" + hour.getText().toString() + "','minute':'" + minute.getText().toString() + "','textlines':'" + textinput.getText().toString() + "'},";
                         }
-                        savedString += "]";
-                        SharedPreferences sharedPreferences =root.getContext().getSharedPreferences("pref", MODE_PRIVATE);
+                        savedString[0] += "]";
+                        SharedPreferences sharedPreferences = root.getContext().getSharedPreferences("pref", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString(getTime,savedString);
+                        editor.putString(getTime, savedString[0]);
                         editor.commit();
-                        Toast.makeText(root.getContext(), getTime + "날짜로 저장되었습니다.", Toast.LENGTH_SHORT).show();
-
+                        Toast.makeText(root.getContext(), date + "날짜로 저장되었습니다.", Toast.LENGTH_SHORT).show();
 
                     }
-                },50);
+                    },200);
+
+            }
+        });
+        pageViewModel.getdate.observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                date = s;
             }
         });
         pageViewModel.getlists.observe(this, new Observer<ArrayList<String>>() {
             @Override
             public void onChanged(ArrayList<String> strings) {
-                when = strings;
-                if(when != null){
+                strarray = strings;
+                if(strarray != null){
                     list.clear();
                     adapter.notifyDataSetChanged();
-                    hm = when;
+                    hm = strarray;
                     for(int i=0;i<hm.size()/3;i++) {
                         list.add("");
                         adapter.notifyItemInserted(list.size());
@@ -207,7 +214,7 @@ recyclerView.postDelayed(new Runnable() {
                             }
 
                         }
-                    },50);
+                    },100);
 
 
                     adapter.notifyDataSetChanged();

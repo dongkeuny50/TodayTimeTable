@@ -38,9 +38,10 @@ public class PlaceholderFragment_rep extends Fragment {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
 
+    String words = "";
     View root;
     private PageViewModel pageViewModel;
-String finalword;
+String finalword = "";
     static PlaceholderFragment_rep newInstance(int index) {
         PlaceholderFragment_rep fragment = new PlaceholderFragment_rep();
         return fragment;
@@ -56,7 +57,8 @@ String finalword;
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {root = inflater.inflate(R.layout.fragment_rep, container, false);
+            Bundle savedInstanceState) {
+        root = inflater.inflate(R.layout.fragment_rep, container, false);
         Button button = (Button)root.findViewById(R.id.load);
         CalendarView calendarView = (CalendarView)root.findViewById(R.id.calendarView);
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -70,18 +72,17 @@ String finalword;
         button.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View v){
-                String words = "";
                 ArrayList<String> hmt = new ArrayList<>();
                 try {
                     String jhour = "";
                     String jminute = "";
                     String jtextline = "";
+                    words = "";
                 SharedPreferences spf = root.getContext().getSharedPreferences("pref",MODE_PRIVATE);
-               if(finalword != ""){words = spf.getString(finalword,"");}else{
-                   SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d");
-                   Date date = new Date(System.currentTimeMillis());
-                   words = sdf.format(date);}
-                JSONArray jarray = new JSONArray(words);; // JSONArray 생성
+                words = spf.getString(finalword,"");
+
+                    Toast.makeText(root.getContext(), finalword + " 불러오기 성공", Toast.LENGTH_SHORT).show();
+                JSONArray jarray = new JSONArray(words); // JSONArray 생성
                     for(int i=0; i < jarray.length()-1; i++){
 
                         JSONObject jObject = jarray.getJSONObject(i);  // JSONObject 추출
@@ -93,10 +94,12 @@ String finalword;
                         hmt.add(jtextline);
                     }
 
-                pageViewModel.setLists(hmt);
-                    Toast.makeText(root.getContext(), "성공", Toast.LENGTH_SHORT).show();
+                    pageViewModel.setLists(hmt);
+                    pageViewModel.setDate(finalword);
                 } catch (JSONException e) {
-                    Toast.makeText(root.getContext(),"불러오기 실패: 저장파일 없음",Toast.LENGTH_SHORT).show();
+                    pageViewModel.setLists(new ArrayList<String>());
+                    pageViewModel.setDate(finalword);
+                    Toast.makeText(root.getContext(),"불러오기 실패, "+finalword+"에 새롭게 생성",Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
             }
