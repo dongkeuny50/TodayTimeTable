@@ -11,6 +11,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
+
         final TextView textView = (TextView)findViewById(R.id.title);
         pageViewModel = ViewModelProviders.of(this).get(PageViewModel.class);
         tabs.setupWithViewPager(viewPager);
@@ -69,4 +71,5 @@ public class MainActivity extends AppCompatActivity {
         });*/
 
     }
+
 }

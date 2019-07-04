@@ -219,10 +219,17 @@ recyclerView.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             for (int i = 0; i < list.size(); i++) {
-                                View view = recyclerView.findViewHolderForAdapterPosition(i).itemView;
-                                EditText hour = view.findViewById(R.id.time);
-                                EditText minute = view.findViewById(R.id.minute);
-                                EditText textinput = view.findViewById(R.id.textlines);
+                                RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder)
+                                        recyclerView.findViewHolderForAdapterPosition(i);
+                                if (null != holder) {
+                                    holder.itemView.setVisibility(View.VISIBLE);
+                                    holder.itemView.findViewById(R.id.time).setVisibility(View.VISIBLE);
+                                    holder.itemView.findViewById(R.id.minute).setVisibility(View.VISIBLE);
+                                    holder.itemView.findViewById(R.id.textlines).setVisibility(View.VISIBLE);
+                                    View view = holder.itemView;
+                                    EditText hour = view.findViewById(R.id.time);
+                                    EditText minute = view.findViewById(R.id.minute);
+                                    EditText textinput = view.findViewById(R.id.textlines);
                                 jh = hm.get(i * 3);
                                 jm = hm.get(i * 3 + 1);
                                 jt = hm.get(i * 3 + 2);
@@ -230,7 +237,7 @@ recyclerView.postDelayed(new Runnable() {
                                 hour.setText(jh);
                                 minute.setText(jm);
                                 textinput.setText(jt);
-                            }
+                            }}
 
                         }
                     },100);

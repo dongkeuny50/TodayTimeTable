@@ -1,5 +1,6 @@
 package com.example.todaytimetable.ui.main;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -72,6 +73,7 @@ String finalword = "";
             }
         });
         button.setOnClickListener(new Button.OnClickListener(){
+            @SuppressLint("ResourceType")
             @Override
             public void onClick(View v){
                 ArrayList<String> hmt = new ArrayList<>();
@@ -98,7 +100,6 @@ String finalword = "";
                     pageViewModel.setLists(hmt);
                     pageViewModel.setDate(finalword);
                     Toast.makeText(root.getContext(), finalword + " 불러오기 성공", Toast.LENGTH_SHORT).show();
-
                 } catch (JSONException e) {
                     pageViewModel.setLists(new ArrayList<String>());
                     pageViewModel.setDate(finalword);
