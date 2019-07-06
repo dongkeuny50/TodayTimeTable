@@ -134,9 +134,10 @@ String finalword = "";
                         hmt.add(jtextline);
                     }
 
+                    pageViewModel.setLists(new ArrayList<String>());
                     pageViewModel.setLists(hmt);
                     pageViewModel.setDate(finalword);
-                    Toast.makeText(root.getContext(), finalword + " 불러오기 성공", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(root.getContext(), " 불러오기 성공", Toast.LENGTH_SHORT).show();
 
                     SharedPreferences sharedPreferences = root.getContext().getSharedPreferences("pref",MODE_PRIVATE);
 

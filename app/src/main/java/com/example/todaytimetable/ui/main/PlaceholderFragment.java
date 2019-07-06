@@ -34,8 +34,8 @@ public class PlaceholderFragment extends Fragment {
     private PageViewModel pageViewModel;
     private ArrayList<String> strarray = new ArrayList<String>();
     private static final String ARG_SECTION_NUMBER = "section_number";
-private View root;
-View view;
+    private View root;
+    View view;
     private ArrayList<String> list;
     private String jh = "";
     private String jm = "";
@@ -84,41 +84,12 @@ View view;
         deletebutton.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View v){
-                recyclerView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        for(int i=0;i < list.size();i++){
-                            RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder)
-                                    recyclerView.findViewHolderForAdapterPosition(i);
-                            if (null != holder) {
-                                holder.itemView.setVisibility(View.VISIBLE);
-                                holder.itemView.findViewById(R.id.time).setVisibility(View.VISIBLE);
-                                holder.itemView.findViewById(R.id.minute).setVisibility(View.VISIBLE);
-                                holder.itemView.findViewById(R.id.textlines).setVisibility(View.VISIBLE);
-                                View view = holder.itemView;
-                                EditText hour = view.findViewById(R.id.time);
-                                EditText minute = view.findViewById(R.id.minute);
-                                EditText textinput = view.findViewById(R.id.textlines);
-                                hour.setText("");
-                                minute.setText("");
-                                textinput.setText("");
-                            }
-                            adapter.notifyDataSetChanged();
-                        }
 
-                    }
-                },100);
 
-recyclerView.postDelayed(new Runnable() {
-    @Override
-    public void run() {
-        for(int i=list.size()-1;i >=0 ;i--){
-            list.remove(i);
-            adapter.notifyItemRemoved(i);
-        }
-
-    }
-},200);
+                list= new ArrayList<>();
+                recyclerView.setLayoutManager(new LinearLayoutManager(root.getContext())) ;
+                adapter = new recyclerview(list) ;
+                recyclerView.setAdapter(adapter) ;
             }
         });
         Button textdeletebutton = root.findViewById(R.id.text_delete);
@@ -187,7 +158,7 @@ recyclerView.postDelayed(new Runnable() {
                         Toast.makeText(root.getContext(), getTime + "날짜로 저장되었습니다.", Toast.LENGTH_SHORT).show();
 
                     }
-                    },200);
+                },200);
 
             }
         });
@@ -204,6 +175,11 @@ recyclerView.postDelayed(new Runnable() {
                 if(strarray != null){
                     list.clear();
                     adapter.notifyDataSetChanged();
+
+                    list= new ArrayList<>();
+                    recyclerView.setLayoutManager(new LinearLayoutManager(root.getContext())) ;
+                    adapter = new recyclerview(list) ;
+                    recyclerView.setAdapter(adapter) ;
                     hm = strarray;
                     for(int i=0;i<hm.size()/3;i++) {
                         list.add("");
@@ -227,14 +203,14 @@ recyclerView.postDelayed(new Runnable() {
                                     EditText hour = view.findViewById(R.id.time);
                                     EditText minute = view.findViewById(R.id.minute);
                                     EditText textinput = view.findViewById(R.id.textlines);
-                                jh = hm.get(i * 3);
-                                jm = hm.get(i * 3 + 1);
-                                jt = hm.get(i * 3 + 2);
+                                    jh = hm.get(i * 3);
+                                    jm = hm.get(i * 3 + 1);
+                                    jt = hm.get(i * 3 + 2);
 
-                                hour.setText(jh);
-                                minute.setText(jm);
-                                textinput.setText(jt);
-                            }}
+                                    hour.setText(jh);
+                                    minute.setText(jm);
+                                    textinput.setText(jt);
+                                }}
 
                         }
                     },100);

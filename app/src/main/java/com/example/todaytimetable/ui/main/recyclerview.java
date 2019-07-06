@@ -51,6 +51,7 @@ public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> 
         final EditText editText = (EditText) view.findViewById(R.id.textlines);
         final EditText hour = (EditText)view.findViewById(R.id.time);
         final EditText minute = (EditText)view.findViewById(R.id.minute);
+        final TextView ampm = (TextView)view.findViewById(R.id.ampm);
         hour.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -64,9 +65,25 @@ public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> 
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(hour.length()==2){
-                    minute.requestFocus();
+                int h;
+                boolean trig = true;
+                if(hour.getText()!=null) {
+                    try{
+                    h = Integer.parseInt(hour.getText().toString());
+                    if (h > 12 && trig) {
+                        ampm.setText("오후");
+                        hour.setText(String.valueOf(h - 12));
+                        trig = false;
+                        minute.requestFocus();
+                    }
+                    else if (hour.length() == 2) {
+
+                        ampm.setText("오전");
+                        minute.requestFocus();
+                    }}catch (NumberFormatException e){
+                    }
                 }
+
             }
         });
         minute.addTextChangedListener(new TextWatcher() {
@@ -100,7 +117,7 @@ public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> 
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(editText.length() == 10){
+                if(editText.length() == 8){
                     editText.append("\n");
                 }
             }
