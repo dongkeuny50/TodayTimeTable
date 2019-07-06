@@ -71,8 +71,6 @@ View view;
         recyclerView.setLayoutManager(new LinearLayoutManager(root.getContext())) ;
         adapter = new recyclerview(list) ;
         recyclerView.setAdapter(adapter) ;
-        if(strarray.size() != 0){
-        Toast.makeText(root.getContext(), strarray.get(0), Toast.LENGTH_SHORT).show();}
 
         Button create = root.findViewById(R.id.create);
         create.setOnClickListener(new Button.OnClickListener(){
@@ -152,7 +150,6 @@ recyclerView.postDelayed(new Runnable() {
         textsavebutton.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View v){
-                adapter.notifyDataSetChanged();
                 recyclerView.postDelayed(new Runnable() {
                     @Override
                     public void run() {

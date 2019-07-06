@@ -9,25 +9,37 @@
     android:weightSum="3"
     android:orientation="vertical">
 
-    <CalendarView
-        android:id="@+id/calenderView"
+    <com.prolificinteractive.materialcalendarview.MaterialCalendarView xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/calendarView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/load"
-        app:layout_constraintTop_toTopOf="parent"></CalendarView>
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/load"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:mcv_selectionColor="#a9dbf0cb"
+        app:mcv_showOtherDates="defaults" />
 
     <Button
         android:id="@+id/load"
         android:layout_width="109dp"
         android:layout_height="55dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="50dp"
         android:background="@drawable/button"
         android:text="생성/불러오기"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/delete"
+        android:layout_width="109dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/button"
+        android:text="내용삭제"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

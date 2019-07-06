@@ -1,9 +1,14 @@
 package com.example.todaytimetable.ui.main;
 
+import android.app.Instrumentation;
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -43,7 +48,63 @@ public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) ;
 
         View view = (View) inflater.inflate(R.layout.item_layout, parent, false);
+        final EditText editText = (EditText) view.findViewById(R.id.textlines);
+        final EditText hour = (EditText)view.findViewById(R.id.time);
+        final EditText minute = (EditText)view.findViewById(R.id.minute);
+        hour.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(hour.length()==2){
+                    minute.requestFocus();
+                }
+            }
+        });
+        minute.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(minute.length()==2){
+                    editText.requestFocus();
+                }
+            }
+        });
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(editText.length() == 10){
+                    editText.append("\n");
+                }
+            }
+        });
         return new ViewHolder(view);
     }
 
