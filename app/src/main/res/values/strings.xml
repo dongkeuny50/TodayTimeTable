@@ -4,4 +4,6 @@
     <string name="repository">저장소</string>
     <string name="setting">설정</string>
     <string name="todo">TODO</string>
+    <string name="notification_channel_id">channel</string>
+    <string name="notification_channel_name">channel</string>
 </resources>

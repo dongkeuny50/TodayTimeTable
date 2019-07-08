@@ -1,16 +1,27 @@
 package com.example.todaytimetable.ui.main;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -18,13 +29,19 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.todaytimetable.MainActivity;
 import com.example.todaytimetable.R;
 
+import org.w3c.dom.Text;
+
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -40,6 +57,7 @@ public class PlaceholderFragment extends Fragment {
     private String jh = "";
     private String jm = "";
     private String jt = "";
+    private String apm = "";
     String date = "";
     private String getTime;
     private ArrayList<String> hm = new ArrayList<String>();
@@ -96,17 +114,25 @@ public class PlaceholderFragment extends Fragment {
         textdeletebutton.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View v){
-                adapter.notifyDataSetChanged();
-                for(int i=0;i < list.size();i++){
-                    View view = recyclerView.findViewHolderForAdapterPosition(i).itemView;
-
-                    EditText hour = view.findViewById(R.id.time);
-                    EditText minute = view.findViewById(R.id.minute);
-                    EditText textinput = view.findViewById(R.id.textlines);
-                    hour.setText("");
-                    minute.setText("");
-                    textinput.setText("");
-
+                for (int i = 0; i < list.size(); i++) {
+                    RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder)
+                            recyclerView.findViewHolderForAdapterPosition(i);
+                    if (null != holder) {
+                        holder.itemView.setVisibility(View.VISIBLE);
+                        holder.itemView.findViewById(R.id.ampm).setVisibility(View.VISIBLE);
+                        holder.itemView.findViewById(R.id.time).setVisibility(View.VISIBLE);
+                        holder.itemView.findViewById(R.id.minute).setVisibility(View.VISIBLE);
+                        holder.itemView.findViewById(R.id.textlines).setVisibility(View.VISIBLE);
+                        View view = holder.itemView;
+                        TextView ampm = view.findViewById(R.id.ampm);
+                        EditText hour = view.findViewById(R.id.time);
+                        EditText minute = view.findViewById(R.id.minute);
+                        EditText textinput = view.findViewById(R.id.textlines);
+                        ampm.setText("");
+                        hour.setText("");
+                        minute.setText("");
+                        textinput.setText("");
+                    }
                 }
                 adapter.notifyDataSetChanged();
             }
@@ -121,7 +147,11 @@ public class PlaceholderFragment extends Fragment {
         textsavebutton.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View v){
+
+
+
                 recyclerView.postDelayed(new Runnable() {
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @Override
                     public void run() {
                         final String[] savedString = new String[1];
@@ -133,20 +163,30 @@ public class PlaceholderFragment extends Fragment {
                         else{getTime = date;}
                         savedString[0] = "[";
 
-
+    String jampm = "";
+    String jhour = "";
+    String jminute = "";
+    String jtextinput = "";
+                        ArrayList<String> lists = new ArrayList<String>();
                         for (int i = 0; i < list.size(); i++) {
                             RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder)
                                     recyclerView.findViewHolderForAdapterPosition(i);
                             if (null != holder) {
                                 holder.itemView.setVisibility(View.VISIBLE);
+                                holder.itemView.findViewById(R.id.ampm).setVisibility(View.VISIBLE);
                                 holder.itemView.findViewById(R.id.time).setVisibility(View.VISIBLE);
                                 holder.itemView.findViewById(R.id.minute).setVisibility(View.VISIBLE);
                                 holder.itemView.findViewById(R.id.textlines).setVisibility(View.VISIBLE);
                                 View view = holder.itemView;
+                                TextView ampm = view.findViewById(R.id.ampm);
                                 EditText hour = view.findViewById(R.id.time);
                                 EditText minute = view.findViewById(R.id.minute);
                                 EditText textinput = view.findViewById(R.id.textlines);
-                                savedString[0] += "{'hour':'" + hour.getText().toString() + "','minute':'" + minute.getText().toString() + "','textlines':'" + textinput.getText().toString() + "'},";
+                                jampm = ampm.getText().toString();
+                                jhour = hour.getText().toString();
+                                jminute = minute.getText().toString();
+                                jtextinput = textinput.getText().toString();
+                                savedString[0] += "{'ampm':'" + jampm + "','hour':'" + jhour + "','minute':'" + jminute + "','textlines':'" + jtextinput + "'},";
                             }
                         }
                         savedString[0] += "]";
@@ -155,13 +195,27 @@ public class PlaceholderFragment extends Fragment {
                         editor.putString(getTime, savedString[0]);
                         editor.putString("date",getTime);
                         editor.commit();
-                        Toast.makeText(root.getContext(), getTime + "날짜로 저장되었습니다.", Toast.LENGTH_SHORT).show();
+                       Toast.makeText(root.getContext(), getTime + "날짜로 저장되었습니다.", Toast.LENGTH_SHORT).show();
+lists.add(jampm);
+lists.add(jhour);
+lists.add(jminute);
+lists.add(jtextinput);
+
+                        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d");
+                        Date date = new Date(System.currentTimeMillis());
+if(getTime.equals(sdf.format(date))){
+
+
+}
+
 
                     }
                 },200);
 
             }
+
         });
+
         pageViewModel.getdate.observe(this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
@@ -181,10 +235,11 @@ public class PlaceholderFragment extends Fragment {
                     adapter = new recyclerview(list) ;
                     recyclerView.setAdapter(adapter) ;
                     hm = strarray;
-                    for(int i=0;i<hm.size()/3;i++) {
+                    for(int i=0;i<hm.size()/4;i++) {
                         list.add("");
                         adapter.notifyItemInserted(list.size());
                     }
+apm = "";
                     jh = "";
                     jm = "";
                     jt = "";
@@ -196,17 +251,20 @@ public class PlaceholderFragment extends Fragment {
                                         recyclerView.findViewHolderForAdapterPosition(i);
                                 if (null != holder) {
                                     holder.itemView.setVisibility(View.VISIBLE);
+                                    holder.itemView.findViewById(R.id.ampm).setVisibility(View.VISIBLE);
                                     holder.itemView.findViewById(R.id.time).setVisibility(View.VISIBLE);
                                     holder.itemView.findViewById(R.id.minute).setVisibility(View.VISIBLE);
                                     holder.itemView.findViewById(R.id.textlines).setVisibility(View.VISIBLE);
                                     View view = holder.itemView;
+                                    TextView ampm = view.findViewById(R.id.ampm);
                                     EditText hour = view.findViewById(R.id.time);
                                     EditText minute = view.findViewById(R.id.minute);
                                     EditText textinput = view.findViewById(R.id.textlines);
-                                    jh = hm.get(i * 3);
-                                    jm = hm.get(i * 3 + 1);
-                                    jt = hm.get(i * 3 + 2);
-
+                                    apm = hm.get( i * 4);
+                                    jh = hm.get(i * 4 + 1);
+                                    jm = hm.get(i * 4 + 2);
+                                    jt = hm.get(i * 4 + 3);
+                                    ampm.setText(apm);
                                     hour.setText(jh);
                                     minute.setText(jm);
                                     textinput.setText(jt);

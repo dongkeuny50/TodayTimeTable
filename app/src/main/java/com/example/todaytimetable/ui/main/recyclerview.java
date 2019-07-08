@@ -3,11 +3,13 @@ package com.example.todaytimetable.ui.main;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -52,6 +54,14 @@ public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> 
         final EditText hour = (EditText)view.findViewById(R.id.time);
         final EditText minute = (EditText)view.findViewById(R.id.minute);
         final TextView ampm = (TextView)view.findViewById(R.id.ampm);
+        ampm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(ampm.getText().toString() == "오전"){
+                ampm.setText("오후");}
+                else{ampm.setText("오전");}
+            }
+        });
         hour.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -66,24 +76,53 @@ public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> 
             @Override
             public void afterTextChanged(Editable editable) {
                 int h;
-                boolean trig = true;
+                boolean changer = true;
                 if(hour.getText()!=null) {
                     try{
                     h = Integer.parseInt(hour.getText().toString());
-                    if (h > 12 && trig) {
+                    if (h > 12 && changer) {
                         ampm.setText("오후");
                         hour.setText(String.valueOf(h - 12));
-                        trig = false;
+                        changer = false;
                         minute.requestFocus();
                     }
-                    else if (hour.length() == 2) {
+                    else if(hour.length() == 2){
+                        if(h<10){
+                        hour.setText(hour.getText().toString().substring(1));
+                            ampm.setText("오전");
+                            minute.requestFocus();}
+                        else{
+                            ampm.setText("오후");
+                            minute.requestFocus();}
 
-                        ampm.setText("오전");
-                        minute.requestFocus();
-                    }}catch (NumberFormatException e){
+                    }
+                    }catch (NumberFormatException e){
                     }
                 }
 
+            }
+
+        });
+
+        hour.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                    try{
+                   int h = Integer.parseInt(hour.getText().toString());
+
+                        if(h <= 12){
+                            ampm.setText("오전");
+                            minute.requestFocus();
+                        }
+                    }
+                    catch (NumberFormatException e){
+
+                        minute.requestFocus();
+                    }
+                    ampm.setText("오전");
+                    return true;
+                }
+                return false;
             }
         });
         minute.addTextChangedListener(new TextWatcher() {
@@ -105,6 +144,8 @@ public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> 
             }
         });
         editText.addTextChangedListener(new TextWatcher() {
+
+            boolean trigger = true;
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -117,11 +158,18 @@ public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> 
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(editText.length() == 8){
+                if(editText.length() == 8 && trigger){
                     editText.append("\n");
+                    trigger = false;
                 }
+                if(editText.length() <8 && !trigger){
+                    trigger = true;
+                }
+
             }
         });
+        editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        editText.setRawInputType(InputType.TYPE_CLASS_TEXT);
         return new ViewHolder(view);
     }
 
@@ -136,5 +184,8 @@ public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> 
     public int getItemCount() {
         return mData.size();
     }
+
+
+
 
 }

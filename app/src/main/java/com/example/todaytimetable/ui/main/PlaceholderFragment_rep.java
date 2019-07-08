@@ -3,6 +3,7 @@ package com.example.todaytimetable.ui.main;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.Editable;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -110,6 +112,7 @@ String finalword = "";
             }
                                               });
                 button.setOnClickListener(new Button.OnClickListener(){
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @SuppressLint("ResourceType")
             @Override
             public void onClick(View v){
@@ -118,6 +121,7 @@ String finalword = "";
                     String jhour = "";
                     String jminute = "";
                     String jtextline = "";
+                    String japm = "";
                     words = "";
                 SharedPreferences spf = root.getContext().getSharedPreferences("pref",MODE_PRIVATE);
                 words = spf.getString(finalword,"");
@@ -126,9 +130,11 @@ String finalword = "";
                     for(int i=0; i < jarray.length()-1; i++){
 
                         JSONObject jObject = jarray.getJSONObject(i);  // JSONObject 추출
+                        japm = jObject.getString("ampm");
                         jhour = jObject.getString("hour");
                         jminute = jObject.getString("minute");
                         jtextline = jObject.getString("textlines");
+                        hmt.add(japm);
                         hmt.add(jhour);
                         hmt.add(jminute);
                         hmt.add(jtextline);
@@ -154,6 +160,8 @@ String finalword = "";
                         }
                     }
 
+                    ((MainActivity)getActivity()).moveview();
+
                 } catch (JSONException s) {
                     pageViewModel.setLists(new ArrayList<String>());
                     pageViewModel.setDate(finalword);
@@ -172,6 +180,8 @@ String finalword = "";
                     }
                     s.printStackTrace();
                 }
+
+                ((MainActivity)getActivity()).moveview();
             }
         });
     Button delete = (Button)root.findViewById(R.id.delete);
