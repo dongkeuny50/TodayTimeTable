@@ -186,11 +186,14 @@ String finalword = "";
         });
     Button delete = (Button)root.findViewById(R.id.delete);
     delete.setOnClickListener(new View.OnClickListener() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void onClick(View view) {
+            try{((MainActivity)getActivity()).cancelallOnDelete();}catch(NullPointerException e){}
             SharedPreferences sharedPreferences = root.getContext().getSharedPreferences("pref",MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             if(finalword != "") {
+
                 editor.remove(finalword);
                 editor.commit();
                     materialCalendarView.removeDecorators();

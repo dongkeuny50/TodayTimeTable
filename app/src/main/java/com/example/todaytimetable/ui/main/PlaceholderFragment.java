@@ -1,6 +1,7 @@
 package com.example.todaytimetable.ui.main;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +60,7 @@ public class PlaceholderFragment extends Fragment {
     private String jm = "";
     private String jt = "";
     private String apm = "";
+    private int savesize = 0;
     String date = "";
     private String getTime;
     private ArrayList<String> hm = new ArrayList<String>();
@@ -151,9 +154,17 @@ public class PlaceholderFragment extends Fragment {
 
 
                 recyclerView.postDelayed(new Runnable() {
+                    @TargetApi(Build.VERSION_CODES.N)
                     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @Override
                     public void run() {
+                        for(int i = 0; i < savesize/4;i++){
+                            try{((MainActivity)getActivity()).cancelall(i);}
+                            catch (NullPointerException e){
+                                Log.d("오류","생김");
+                            }
+                        }
+                        ArrayList<String> lists = new ArrayList<String>();
                         final String[] savedString = new String[1];
                         if(date == "") {
                             @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d");
@@ -167,7 +178,6 @@ public class PlaceholderFragment extends Fragment {
     String jhour = "";
     String jminute = "";
     String jtextinput = "";
-                        ArrayList<String> lists = new ArrayList<String>();
                         for (int i = 0; i < list.size(); i++) {
                             RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder)
                                     recyclerView.findViewHolderForAdapterPosition(i);
@@ -187,6 +197,12 @@ public class PlaceholderFragment extends Fragment {
                                 jminute = minute.getText().toString();
                                 jtextinput = textinput.getText().toString();
                                 savedString[0] += "{'ampm':'" + jampm + "','hour':'" + jhour + "','minute':'" + jminute + "','textlines':'" + jtextinput + "'},";
+
+                                lists.add(jampm);
+                                lists.add(jhour);
+                                lists.add(jminute);
+                                lists.add(jtextinput);
+
                             }
                         }
                         savedString[0] += "]";
@@ -195,18 +211,17 @@ public class PlaceholderFragment extends Fragment {
                         editor.putString(getTime, savedString[0]);
                         editor.putString("date",getTime);
                         editor.commit();
+                        savesize = lists.size();
                        Toast.makeText(root.getContext(), getTime + "날짜로 저장되었습니다.", Toast.LENGTH_SHORT).show();
-lists.add(jampm);
-lists.add(jhour);
-lists.add(jminute);
-lists.add(jtextinput);
 
                         @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d");
                         Date date = new Date(System.currentTimeMillis());
 if(getTime.equals(sdf.format(date))){
+    if(lists != null && lists.size()>=1){
+                            ((MainActivity)getActivity()).doalarm(lists);
+    }
 
-
-}
+                        }
 
 
                     }

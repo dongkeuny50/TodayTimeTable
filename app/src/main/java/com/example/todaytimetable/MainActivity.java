@@ -39,7 +39,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.todaytimetable.ui.main.SectionsPagerAdapter;
@@ -51,25 +53,27 @@ import java.util.Date;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class MainActivity extends AppCompatActivity {
+    public static Context mcontext;
+AlarmManager[] temp;
+Intent[] tempintent;
+PendingIntent[] tempending;
+    Context context;
+    int count=0;
     PageViewModel pageViewModel;
     String date = "";
     ViewPager viewPager;
-    private ArrayList<String> timelist = new ArrayList<String>();
-    public AsyncTask<Void,Void,Void> task;
-    private static int ONE_MINUTE = 5626;
-    private int sizeOfTime;
-String nowtime;
-private boolean setalarm = false;
     @TargetApi(Build.VERSION_CODES.N)
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mcontext = this;
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
+        this.context = this;
         final TextView textView = (TextView)findViewById(R.id.title);
         pageViewModel = ViewModelProviders.of(this).get(PageViewModel.class);
         tabs.setupWithViewPager(viewPager);
@@ -100,85 +104,78 @@ private boolean setalarm = false;
    public void moveview(){
         viewPager.setCurrentItem(0);
 
-    }/*
-    @SuppressLint("StaticFieldLeak")
-    public void ShowTime(){
-        task = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                while(true){
-                    try{
-                        publishProgress();
-                        Thread.sleep(1000);
+    }
+    public void doalarm(ArrayList<String> strlist){
+        count = strlist.size()/4;
+try{
+temp = new AlarmManager[strlist.size()/4];
+tempending = new PendingIntent[strlist.size()/4];
+tempintent = new Intent[strlist.size()/4];
+        AlarmManager alarm_manager =(AlarmManager) getSystemService(ALARM_SERVICE);
+        for(int i = 0; i < strlist.size()/4;i++){
+            if(strlist.get(i*4+1)!= "" && strlist.get(i*4+2) != ""){
+            // 알람매니저 설정
+            // 타임피커 설정
+            // Calendar 객체 생성
+            Calendar calendar = Calendar.getInstance();
 
-                    }catch(InterruptedException e){
-                        e.printStackTrace();
-                    }
+            // 알람리시버 intent 생
+            Intent my_intent = new Intent(this.context, Alarm_Reciver.class);
+        // calendar에 시간 셋팅
+        int tempampm = 0;
+        if(strlist.get(i * 4).equals("오후")){
+            tempampm = 12;
+        }
+        if(strlist.get(i * 4).equals("오전")){
+            if(Integer.parseInt(strlist.get(i*4+1)) == 12){}
+                    tempampm = -12;
                 }
+        int temphour = tempampm + Integer.parseInt(strlist.get(i*4+1));
+        Log.d("",String.valueOf(temphour));
+        int tempminute = Integer.parseInt(strlist.get(i*4+2));
+        calendar.set(Calendar.HOUR_OF_DAY, temphour);
+        calendar.set(Calendar.MINUTE, tempminute);
+
+        // 시간 가져옴
+            final int intent_id= (int) System.currentTimeMillis();
+        // reveiver에 string 값 넘겨주기
+        my_intent.putExtra("state","alarm on");
+        my_intent.putExtra("ID",i);
+
+        my_intent.putExtra("Time",String.valueOf(strlist.get(i*4+1)) + " : "+strlist.get(i*4+2));
+        my_intent.putExtra("Todo",strlist.get(i*4+3)+"");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,   i, my_intent,
+                PendingIntent.FLAG_ONE_SHOT);
+            // 알람셋팅
+        alarm_manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                pendingIntent);
+            temp[i] = alarm_manager;
+            tempintent[i] = my_intent;
+            tempending[i] = pendingIntent;
+
             }
-            @SuppressLint("SimpleDateFormat")
-            @Override
-            protected void onProgressUpdate(Void... progress){
-                Date now = new Date();
-                SimpleDateFormat format = new SimpleDateFormat("H:m");
-                nowtime = format.format(now);
-                if(setalarm){
-                    Log.d(this.getClass().getName(),"sucksexs");
-                for(int i = 0; i <timelist.size()/4;i++){
-                    if(timelist.get(i*4) == "오후"){
-                        timelist.set(i * 4 + 1, String.valueOf((12+Integer.parseInt(timelist.get(i*4+1)
-                        )
-                        )
-                        )
-                        );}
-                    else if(timelist.get(i*4) == "오전" && Integer.parseInt(timelist.get(i*4+1))== 12){
-                        timelist.set(i * 4 + 1, String.valueOf((Integer.parseInt(timelist.get(i*4+1))-12)));
-                    }
-                    }
-                sizeOfTime = timelist.size()/4;
-                setalarm = false;
-                }
-
-                    for(int i = 0; i <sizeOfTime;i++){
-                    if(nowtime.equals(timelist.get(i*4+1)+":"+timelist.get(i*4+2))){
-                        notification(timelist.get(i*4+1)+"",timelist.get(i*4+2)+"",timelist.get(i*4+3)+"");
-                        timelist.set(i*4,"");
-                        timelist.set(i*4+1,"");
-                        timelist.set(i*4+2,"");
-                        timelist.set(i*4+3,"");
-
-                        Log.d(this.getClass().getName(),"sucksexxx");
-                    }
-
-
-                }
-            }
-        };
-        task.execute();
     }
-public void notification(String hour, String minute, String textline){//푸시 알림을 보내기위해 시스템에 권한을 요청하여 생성
-    NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "default");
+    }catch(NumberFormatException e){
+    Toast.makeText(this, "정확한 숫자를 입력하세요", Toast.LENGTH_SHORT).show();
+    
+}}
+    public void cancelall(int i){
 
-    builder.setSmallIcon(R.mipmap.ic_launcher);
-    builder.setContentTitle("현재시각 :  " + hour + " : " + minute);
-    builder.setContentText(textline + "을(를)하실 시간입니다.");
-// 알림 표시
-    NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        notificationManager.createNotificationChannel(new NotificationChannel("default", "기본 채널", NotificationManager.IMPORTANCE_DEFAULT));
+        temp[i].cancel(tempending[i]);
+
+        tempintent[i].putExtra("state","alarm off");
+        // 알람취소
+        sendBroadcast(tempintent[i]);
     }
+    public void cancelallOnDelete(){
+        if(count != 0){
+for(int i = 0; i < count; i++){
+        temp[i].cancel(tempending[i]);
 
-// id값은
-// 정의해야하는 각 알림의 고유한 int값
-    notificationManager.notify(1, builder.build());
-    }
-
-
-public void setlists(ArrayList<String> strlist){
-        timelist = new ArrayList<String>();
-        timelist =strlist;
-setalarm = true;
-    Toast.makeText(this, "sibal", Toast.LENGTH_SHORT).show();
-    }*/
-
+        tempintent[i].putExtra("state","alarm off");
+        // 알람취소
+        sendBroadcast(tempintent[i]);
 }
+    }}
+        
+    }
