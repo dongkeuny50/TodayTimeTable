@@ -11,13 +11,15 @@ import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import java.util.Random;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class RingtonePlayingService extends Service {
 
@@ -49,27 +51,31 @@ public class RingtonePlayingService extends Service {
 
         String getState = intent.getExtras().getString("state");
         id = intent.getIntExtra("ID",0);
-        gettime= intent.getExtras().getString("Time");
-        gettodo= intent.getExtras().getString("Todo");
+        Log.d(TAG, "onStartCommand: "+String.valueOf(id));
+        gettime= intent.getExtras().getString("Time"+String.valueOf(id));
+        Log.d(TAG, "onStartCommand: "+gettime);
+        gettodo= intent.getExtras().getString("Todo"+String.valueOf(id));
         // intent로부터 전달받은 string
         if (Build.VERSION.SDK_INT >= 26) {
             String CHANNEL_ID = "default";
+            RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.notifilayout);
+            remoteViews.setTextViewText(R.id.alarmtext, gettime);
+            remoteViews.setTextViewText(R.id.alarmtextline, gettodo);
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
                     "알림",
                     NotificationManager.IMPORTANCE_DEFAULT);
             PendingIntent notifyintent= PendingIntent.getActivity(getApplicationContext(),0,new Intent(),0);
-
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
             //알림바 클릭시 이동을 위한 Intent
+            remoteViews.setOnClickPendingIntent(R.id.delete,notifyintent);
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setContentTitle(gettime)
-                    .setContentText(gettodo)
+                    .setContent(remoteViews)
                     .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentIntent(notifyintent)
                     .setAutoCancel(true)
+                    .setContentIntent(notifyintent)
                     .build();
-            deal += 1;
-            startForeground(deal, notification);
+            NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            nm.notify(id, notification);
         }
         assert getState != null;
         switch (getState) {

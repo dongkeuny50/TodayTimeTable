@@ -19,6 +19,7 @@
             android:minHeight="?actionBarSize"
             android:padding="@dimen/appbar_padding"
             android:text="오늘의 할일"
+            android:fontFamily="@font/bingrebold"
             android:layout_gravity="center"
             android:background="@color/titlecolor"
             android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title" />

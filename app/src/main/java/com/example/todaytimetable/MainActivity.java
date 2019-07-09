@@ -51,6 +51,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static androidx.constraintlayout.widget.Constraints.TAG;
+
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class MainActivity extends AppCompatActivity {
     public static Context mcontext;
@@ -124,7 +126,8 @@ tempintent = new Intent[strlist.size()/4];
         // calendar에 시간 셋팅
         int tempampm = 0;
         if(strlist.get(i * 4).equals("오후")){
-            tempampm = 12;
+            if(!strlist.get(i * 4 + 1).equals(String.valueOf(12))){
+            tempampm = 12;}
         }
         if(strlist.get(i * 4).equals("오전")){
             if(Integer.parseInt(strlist.get(i*4+1)) == 12){}
@@ -137,13 +140,16 @@ tempintent = new Intent[strlist.size()/4];
         calendar.set(Calendar.MINUTE, tempminute);
 
         // 시간 가져옴
-            final int intent_id= (int) System.currentTimeMillis();
         // reveiver에 string 값 넘겨주기
         my_intent.putExtra("state","alarm on");
         my_intent.putExtra("ID",i);
-
-        my_intent.putExtra("Time",String.valueOf(strlist.get(i*4+1)) + " : "+strlist.get(i*4+2));
-        my_intent.putExtra("Todo",strlist.get(i*4+3)+"");
+        String value1 = strlist.get(i*4+1) + " : "+strlist.get(i*4+2);
+        String value2 =strlist.get(i*4+3)+"";
+        String name1 = "Time" + i;
+        String name2 = "Todo" + i;
+        my_intent.putExtra(name1,value1);
+        my_intent.putExtra(name2,value2);
+                Log.d("sex", "doalarm: "+value1);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,   i, my_intent,
                 PendingIntent.FLAG_ONE_SHOT);
             // 알람셋팅
@@ -177,5 +183,11 @@ for(int i = 0; i < count; i++){
         sendBroadcast(tempintent[i]);
 }
     }}
-        
+
+    public void cancelAll(){
+
+        NotificationManager notifiyMgr = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        notifiyMgr.cancelAll();
+        Log.d(TAG, "onReceive: "+"sex");
+    }
     }

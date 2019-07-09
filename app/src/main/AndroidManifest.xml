@@ -23,7 +23,12 @@
         <receiver android:name=".Alarm_Reciver" />
         <service
         android:name=".RingtonePlayingService"
-        android:enabled="true"></service>
+        android:enabled="true">
+            <intent-filter>
+                <action android:name="CLOSE"/>
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
