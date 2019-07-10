@@ -15,11 +15,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.CalendarView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -28,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.todaytimetable.MainActivity;
 import com.example.todaytimetable.R;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -188,20 +191,40 @@ int num;
                 if(b){
                     AlarmManager am = (AlarmManager) view.getContext().getSystemService(Context.ALARM_SERVICE);
                     Intent intent = new Intent(view.getContext(), broadcastD.class);
-                    PendingIntent sender = PendingIntent.getBroadcast(view.getContext(), num, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTimeInMillis(System.currentTimeMillis());
-                    calendar.clear();
-                    int hours = Integer.parseInt(String.valueOf(hour.getText()));
-                    int minutes = Integer.parseInt(String.valueOf(minute.getText()));
-                    Log.d(TAG, "onCheckedChanged: " + hours + minutes);
-                    calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), hours, minutes, 0);
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M){
-                        am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),sender);
-                    } else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-                        am.setExact(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),sender);
-                    } else {
-                        am.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),sender);
+                    int hours = 0;
+                    int minutes = 0;
+                    int ampmplus = 0;
+                    String strhour = String.valueOf(hour.getText());
+                    String strminute = String.valueOf(minute.getText());
+                    String strampm = String.valueOf(ampm.getText());
+                    String strtextline = String.valueOf(editText.getText());
+                    intent.putExtra("hours",strhour);
+                    intent.putExtra("minutes",strminute);
+                    intent.putExtra("ampm",strampm);
+                    intent.putExtra("textline",strtextline);
+                    if(ampm.getText().toString().equals("오후")){if(Integer.parseInt(String.valueOf(hour.getText())) != 12){ampmplus = 12;}
+                    else if(Integer.parseInt(String.valueOf(hour.getText())) == 12){ampmplus = -12;} }
+                    if(ampm.getText().toString().equals("오전")){if(Integer.parseInt(String.valueOf(hour.getText())) == 12){ampmplus = -12;} }
+                    try{
+                    hours = Integer.parseInt(String.valueOf(hour.getText()))+ampmplus;
+                    minutes = Integer.parseInt(String.valueOf(minute.getText()));
+
+                        PendingIntent sender = PendingIntent.getBroadcast(view.getContext(), num, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), hours, minutes, 0);
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M){
+                            assert am != null;
+                            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),sender);
+                        } else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+                            assert am != null;
+                            am.setExact(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),sender);
+                        } else {
+                            assert am != null;
+                            am.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),sender);
+                        }
+                    }
+                    catch (NumberFormatException e){
+                        Toast.makeText(context, "올바른 시간을 입력하세요.", Toast.LENGTH_SHORT).show();
                     }
                 }
                 else{
@@ -212,6 +235,7 @@ int num;
                     if (sender != null) {
                         am.cancel(sender);
                         sender.cancel();}
+                    Log.d(TAG, "onCheckedChanged: "+num);
                 }
             }
         });
