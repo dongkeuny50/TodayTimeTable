@@ -21,6 +21,7 @@ import android.os.Bundle;
 
 import com.example.todaytimetable.ui.main.PageViewModel;
 import com.example.todaytimetable.ui.main.PlaceholderFragment;
+import com.example.todaytimetable.ui.main.broadcastD;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
@@ -35,6 +36,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,17 +53,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class MainActivity extends AppCompatActivity {
-    public static Context mcontext;
-AlarmManager[] temp;
-Intent[] tempintent;
-PendingIntent[] tempending;
-    Context context;
     int count=0;
     PageViewModel pageViewModel;
+public Context context;
+    static PowerManager.WakeLock wakeLock;
+
     String date = "";
     ViewPager viewPager;
     @TargetApi(Build.VERSION_CODES.N)
@@ -70,12 +71,11 @@ PendingIntent[] tempending;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mcontext = this;
+        context = this;
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
-        this.context = this;
         final TextView textView = (TextView)findViewById(R.id.title);
         pageViewModel = ViewModelProviders.of(this).get(PageViewModel.class);
         tabs.setupWithViewPager(viewPager);
@@ -103,91 +103,10 @@ PendingIntent[] tempending;
             }
         });*/
     }
+
    public void moveview(){
         viewPager.setCurrentItem(0);
 
     }
-    public void doalarm(ArrayList<String> strlist){
-        count = strlist.size()/4;
-try{
-temp = new AlarmManager[strlist.size()/4];
-tempending = new PendingIntent[strlist.size()/4];
-tempintent = new Intent[strlist.size()/4];
-        AlarmManager alarm_manager =(AlarmManager) getSystemService(ALARM_SERVICE);
-        for(int i = 0; i < strlist.size()/4;i++){
-            if(strlist.get(i*4+1)!= "" && strlist.get(i*4+2) != ""){
-            // 알람매니저 설정
-            // 타임피커 설정
-            // Calendar 객체 생성
-            Calendar calendar = Calendar.getInstance();
 
-            // 알람리시버 intent 생
-            Intent my_intent = new Intent(this.context, Alarm_Reciver.class);
-        // calendar에 시간 셋팅
-        int tempampm = 0;
-        if(strlist.get(i * 4).equals("오후")){
-            if(!strlist.get(i * 4 + 1).equals(String.valueOf(12))){
-            tempampm = 12;}
-        }
-        if(strlist.get(i * 4).equals("오전")){
-            if(Integer.parseInt(strlist.get(i*4+1)) == 12){}
-                    tempampm = -12;
-                }
-        int temphour = tempampm + Integer.parseInt(strlist.get(i*4+1));
-        Log.d("",String.valueOf(temphour));
-        int tempminute = Integer.parseInt(strlist.get(i*4+2));
-        calendar.set(Calendar.HOUR_OF_DAY, temphour);
-        calendar.set(Calendar.MINUTE, tempminute);
-
-        // 시간 가져옴
-        // reveiver에 string 값 넘겨주기
-        my_intent.putExtra("state","alarm on");
-        my_intent.putExtra("ID",i);
-        String value1 = strlist.get(i*4+1) + " : "+strlist.get(i*4+2);
-        String value2 =strlist.get(i*4+3)+"";
-        String name1 = "Time" + i;
-        String name2 = "Todo" + i;
-        my_intent.putExtra(name1,value1);
-        my_intent.putExtra(name2,value2);
-                Log.d("sex", "doalarm: "+value1);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,   i, my_intent,
-                PendingIntent.FLAG_ONE_SHOT);
-            // 알람셋팅
-        alarm_manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                pendingIntent);
-            temp[i] = alarm_manager;
-            tempintent[i] = my_intent;
-            tempending[i] = pendingIntent;
-
-            }
-    }
-    }catch(NumberFormatException e){
-    Toast.makeText(this, "정확한 숫자를 입력하세요", Toast.LENGTH_SHORT).show();
-    
-}}
-    public void cancelall(int i){
-
-        temp[i].cancel(tempending[i]);
-
-        tempintent[i].putExtra("state","alarm off");
-        // 알람취소
-        sendBroadcast(tempintent[i]);
-    }
-    public void cancelallOnDelete(){
-        if(count != 0){
-for(int i = 0; i < count; i++){
-        temp[i].cancel(tempending[i]);
-
-        tempintent[i].putExtra("state","alarm off");
-        // 알람취소
-        sendBroadcast(tempintent[i]);
-}
-    }}
-
-    public void cancelAll(){
-
-        NotificationManager notifiyMgr = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        notifiyMgr.cancelAll();
-        Log.d(TAG, "onReceive: "+"sex");
-    }
     }

@@ -33,7 +33,6 @@ public class onDateDecorator  implements DayViewDecorator {
             view.addSpan(new StyleSpan(Typeface.BOLD));
             view.addSpan(new RelativeSizeSpan(1.4f));
             view.addSpan(new ForegroundColorSpan(Color.BLUE));
-            view.addSpan(new DotSpan(5, Color.GREEN));
         }
 
         /**

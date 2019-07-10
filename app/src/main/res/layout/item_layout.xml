@@ -75,7 +75,7 @@
         android:textAlignment="center" />
 
     <Switch
-        android:id="@+id/alarmtext"
+        android:id="@+id/selectalarm"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="1"

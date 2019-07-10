@@ -2,6 +2,7 @@ package com.example.todaytimetable.ui.main;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -52,15 +53,12 @@ public class PlaceholderFragment extends Fragment {
 
     private PageViewModel pageViewModel;
     private ArrayList<String> strarray = new ArrayList<String>();
-    private static final String ARG_SECTION_NUMBER = "section_number";
     private View root;
-    View view;
     private ArrayList<String> list;
     private String jh = "";
     private String jm = "";
     private String jt = "";
     private String apm = "";
-    private int savesize = 0;
     String date = "";
     private String getTime;
     private ArrayList<String> hm = new ArrayList<String>();
@@ -148,9 +146,9 @@ public class PlaceholderFragment extends Fragment {
 
         Button textsavebutton = root.findViewById(R.id.save);
         textsavebutton.setOnClickListener(new Button.OnClickListener(){
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View v){
-
 
 
                 recyclerView.postDelayed(new Runnable() {
@@ -158,12 +156,7 @@ public class PlaceholderFragment extends Fragment {
                     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @Override
                     public void run() {
-                        for(int i = 0; i < savesize/4;i++){
-                            try{((MainActivity)getActivity()).cancelall(i);}
-                            catch (NullPointerException e){
-                                Log.d("오류","생김");
-                            }
-                        }
+
                         ArrayList<String> lists = new ArrayList<String>();
                         final String[] savedString = new String[1];
                         if(date == "") {
@@ -211,17 +204,10 @@ public class PlaceholderFragment extends Fragment {
                         editor.putString(getTime, savedString[0]);
                         editor.putString("date",getTime);
                         editor.commit();
-                        savesize = lists.size();
                        Toast.makeText(root.getContext(), getTime + "날짜로 저장되었습니다.", Toast.LENGTH_SHORT).show();
 
                         @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d");
                         Date date = new Date(System.currentTimeMillis());
-if(getTime.equals(sdf.format(date))){
-    if(lists != null && lists.size()>=1){
-                            ((MainActivity)getActivity()).doalarm(lists);
-    }
-
-                        }
 
 
                     }
@@ -236,10 +222,10 @@ if(getTime.equals(sdf.format(date))){
             public void onChanged(String s) {
                 date = s;
             }
-        });
+        });//오늘날짜
         pageViewModel.getlists.observe(this, new Observer<ArrayList<String>>() {
             @Override
-            public void onChanged(ArrayList<String> strings) {
+            public void onChanged(ArrayList<String> strings) {//오늘시간표
                 strarray = strings;
                 if(strarray != null){
                     list.clear();

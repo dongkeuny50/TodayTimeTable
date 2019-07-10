@@ -20,15 +20,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".Alarm_Reciver" />
-        <service
-        android:name=".RingtonePlayingService"
-        android:enabled="true">
-            <intent-filter>
-                <action android:name="CLOSE"/>
-            </intent-filter>
-        </service>
-
+        <service android:name=".ui.main.serviceD"
+            />
+        <receiver android:name=".ui.main.broadcastD"/>
     </application>
 
 </manifest>

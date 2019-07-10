@@ -1,31 +1,41 @@
 package com.example.todaytimetable.ui.main;
 
-import android.app.Instrumentation;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.icu.util.Calendar;
+import android.os.Build;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.todaytimetable.MainActivity;
 import com.example.todaytimetable.R;
 
-import org.w3c.dom.Text;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> {
     private ArrayList<String> mData = null ;
-
+int num;
     // 아이템 뷰를 저장하는 뷰홀더 클래스.
     public class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout layout;
@@ -46,10 +56,10 @@ public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> 
     @NonNull
     @Override
     public recyclerview.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Context context = parent.getContext() ;
+        final Context context = parent.getContext() ;
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) ;
 
-        View view = (View) inflater.inflate(R.layout.item_layout, parent, false);
+        final View view = (View) inflater.inflate(R.layout.item_layout, parent, false);
         final EditText editText = (EditText) view.findViewById(R.id.textlines);
         final EditText hour = (EditText)view.findViewById(R.id.time);
         final EditText minute = (EditText)view.findViewById(R.id.minute);
@@ -170,6 +180,41 @@ public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> 
         });
         editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         editText.setRawInputType(InputType.TYPE_CLASS_TEXT);
+        Switch alarmswitch = (Switch)view.findViewById(R.id.selectalarm);
+        alarmswitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b){
+                    AlarmManager am = (AlarmManager) view.getContext().getSystemService(Context.ALARM_SERVICE);
+                    Intent intent = new Intent(view.getContext(), broadcastD.class);
+                    PendingIntent sender = PendingIntent.getBroadcast(view.getContext(), num, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis(System.currentTimeMillis());
+                    calendar.clear();
+                    int hours = Integer.parseInt(String.valueOf(hour.getText()));
+                    int minutes = Integer.parseInt(String.valueOf(minute.getText()));
+                    Log.d(TAG, "onCheckedChanged: " + hours + minutes);
+                    calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), hours, minutes, 0);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M){
+                        am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),sender);
+                    } else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+                        am.setExact(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),sender);
+                    } else {
+                        am.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),sender);
+                    }
+                }
+                else{
+                    AlarmManager am = (AlarmManager)view.getContext().getSystemService(Context.ALARM_SERVICE);
+                    Intent intent = new Intent(view.getContext(),broadcastD.class);
+                    PendingIntent sender = PendingIntent.getBroadcast(
+                            view.getContext(), num, intent, PendingIntent.FLAG_NO_CREATE);
+                    if (sender != null) {
+                        am.cancel(sender);
+                        sender.cancel();}
+                }
+            }
+        });
         return new ViewHolder(view);
     }
 
@@ -177,6 +222,7 @@ public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull recyclerview.ViewHolder holder, int position) {
         String text = mData.get(position);
+        num = position;
     }
 
     // getItemCount() - 전체 데이터 갯수 리턴.

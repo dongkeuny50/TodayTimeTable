@@ -179,6 +179,7 @@ String finalword = "";
                         }
                     }
                     s.printStackTrace();
+                    ((MainActivity)getActivity()).moveview();
                 }
 
                 ((MainActivity)getActivity()).moveview();
@@ -189,7 +190,7 @@ String finalword = "";
         @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void onClick(View view) {
-            try{((MainActivity)getActivity()).cancelallOnDelete();}catch(NullPointerException e){}
+
             SharedPreferences sharedPreferences = root.getContext().getSharedPreferences("pref",MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             if(finalword != "") {
@@ -199,6 +200,7 @@ String finalword = "";
                     materialCalendarView.removeDecorators();
                 Map<String,?> keys = sharedPreferences.getAll();
 
+                materialCalendarView.addDecorators(new onDateDecorator());
                 for(Map.Entry<String,?> entry : keys.entrySet()){
                     if(entry.getKey() == finalword){continue;}
                     Log.d("map values",entry.getKey() + ": " +
@@ -212,7 +214,7 @@ String finalword = "";
                 }
                     Toast.makeText(root.getContext(), "삭제 완료.", Toast.LENGTH_SHORT).show();
             }
-            else{
+            else {
                 Toast.makeText(root.getContext(), "저장 내용이 없습니다.", Toast.LENGTH_SHORT).show();
             }
         }
