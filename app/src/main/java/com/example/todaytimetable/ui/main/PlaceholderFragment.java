@@ -157,7 +157,7 @@ public class PlaceholderFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(root.getContext())) ;
         adapter = new recyclerview(list) ;
         recyclerView.setAdapter(adapter) ;
-
+recyclerView.setHasFixedSize(true);
         Button create = root.findViewById(R.id.create);
         create.setOnClickListener(new Button.OnClickListener(){
             @Override

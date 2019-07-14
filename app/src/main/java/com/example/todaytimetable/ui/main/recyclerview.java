@@ -40,6 +40,7 @@ import static androidx.constraintlayout.widget.Constraints.TAG;
 public class recyclerview extends RecyclerView.Adapter<recyclerview.ViewHolder> {
     private ArrayList<String> mData = null ;
 int num;
+View view;
     // 아이템 뷰를 저장하는 뷰홀더 클래스.
     public class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout layout;
@@ -63,7 +64,8 @@ int num;
         final Context context = parent.getContext() ;
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) ;
 
-        final View view = (View) inflater.inflate(R.layout.item_layout, parent, false);
+        view = (View) inflater.inflate(R.layout.item_layout, parent, false);
+
         final EditText editText = (EditText) view.findViewById(R.id.textlines);
         final EditText hour = (EditText)view.findViewById(R.id.time);
         final EditText minute = (EditText)view.findViewById(R.id.minute);
@@ -245,6 +247,20 @@ int num;
             }
         });
         return new ViewHolder(view);
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull ViewHolder holder) {
+
+        AlarmManager am = (AlarmManager)view.getContext().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(view.getContext(),broadcastD.class);
+        PendingIntent sender = PendingIntent.getBroadcast(
+                view.getContext(), num, intent, PendingIntent.FLAG_NO_CREATE);
+        if (sender != null) {
+            am.cancel(sender);
+            sender.cancel();}
+        Log.d(TAG, "onCheckedChanged: "+num);
+        super.onViewDetachedFromWindow(holder);
     }
 
     // onBindViewHolder() - position에 해당하는 데이터를 뷰홀더의 아이템뷰에 표시.
