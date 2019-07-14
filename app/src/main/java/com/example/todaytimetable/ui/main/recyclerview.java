@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.icu.util.Calendar;
 import android.os.Build;
 import android.text.Editable;
@@ -68,11 +69,16 @@ int num;
         final EditText minute = (EditText)view.findViewById(R.id.minute);
         final TextView ampm = (TextView)view.findViewById(R.id.ampm);
         ampm.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View view) {
                 if(ampm.getText().toString() == "오전"){
-                ampm.setText("오후");}
-                else{ampm.setText("오전");}
+                ampm.setText("오후");
+                    ampm.setBackgroundTintList(context.getResources().getColorStateList(R.color.eveningcolor));
+                }
+                else{ampm.setText("오전");
+                    ampm.setBackgroundTintList(context.getResources().getColorStateList(R.color.circlecolor));
+                }
             }
         });
         hour.addTextChangedListener(new TextWatcher() {
@@ -86,6 +92,7 @@ int num;
 
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void afterTextChanged(Editable editable) {
                 int h;
@@ -95,6 +102,7 @@ int num;
                     h = Integer.parseInt(hour.getText().toString());
                     if (h > 12 && changer) {
                         ampm.setText("오후");
+                        ampm.setBackgroundTintList(context.getResources().getColorStateList(R.color.eveningcolor));
                         hour.setText(String.valueOf(h - 12));
                         changer = false;
                         minute.requestFocus();
@@ -103,9 +111,11 @@ int num;
                         if(h<10){
                         hour.setText(hour.getText().toString().substring(1));
                             ampm.setText("오전");
+                            ampm.setBackgroundTintList(context.getResources().getColorStateList(R.color.circlecolor));
                             minute.requestFocus();}
                         else{
                             ampm.setText("오후");
+                            ampm.setBackgroundTintList(context.getResources().getColorStateList(R.color.eveningcolor));
                             minute.requestFocus();}
 
                     }
@@ -118,6 +128,7 @@ int num;
         });
 
         hour.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_NEXT) {
                     try{
@@ -125,6 +136,7 @@ int num;
 
                         if(h <= 12){
                             ampm.setText("오전");
+                            ampm.setBackgroundTintList(context.getResources().getColorStateList(R.color.circlecolor));
                             minute.requestFocus();
                         }
                     }
@@ -133,6 +145,7 @@ int num;
                         minute.requestFocus();
                     }
                     ampm.setText("오전");
+                    ampm.setBackgroundTintList(context.getResources().getColorStateList(R.color.circlecolor));
                     return true;
                 }
                 return false;
@@ -171,14 +184,6 @@ int num;
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(editText.length() == 8 && trigger){
-                    editText.append("\n");
-                    trigger = false;
-                }
-                if(editText.length() <8 && !trigger){
-                    trigger = true;
-                }
-
             }
         });
         editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -202,13 +207,13 @@ int num;
                     intent.putExtra("minutes",strminute);
                     intent.putExtra("ampm",strampm);
                     intent.putExtra("textline",strtextline);
+                    intent.putExtra("state","alarm on");
                     if(ampm.getText().toString().equals("오후")){if(Integer.parseInt(String.valueOf(hour.getText())) != 12){ampmplus = 12;}
-                    else if(Integer.parseInt(String.valueOf(hour.getText())) == 12){ampmplus = -12;} }
+                     }
                     if(ampm.getText().toString().equals("오전")){if(Integer.parseInt(String.valueOf(hour.getText())) == 12){ampmplus = -12;} }
                     try{
                     hours = Integer.parseInt(String.valueOf(hour.getText()))+ampmplus;
                     minutes = Integer.parseInt(String.valueOf(minute.getText()));
-
                         PendingIntent sender = PendingIntent.getBroadcast(view.getContext(), num, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                         Calendar calendar = Calendar.getInstance();
                         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), hours, minutes, 0);

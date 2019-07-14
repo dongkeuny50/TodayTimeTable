@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,36 +21,32 @@ import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class broadcastD extends BroadcastReceiver {
     String INTENT_ACTION = Intent.ACTION_BOOT_COMPLETED;
+    Context context;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onReceive(Context context, Intent intent) {//알람 시간이 되었을때 onReceive를 호출함
-        //NotificationManager 안드로이드 상태바에 메세지를 던지기위한 서비스 불러오고
-        Log.d(TAG, "onReceive: "+"Error");
-        String hour = intent.getExtras().getString("hours");
-        String minute = intent.getExtras().getString("minutes");
-        String ampm = intent.getExtras().getString("ampm");
-        String textline = intent.getExtras().getString("textline");
-        NotificationManager notificationmanager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT);
-        Notification.Builder builder = new Notification.Builder(context);
-        builder
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setTicker("HETT")
-                .setNumber(1)
-                .setContentTitle(ampm + "  " + hour + ":"+minute)
-                .setContentText(textline)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-            String channelId = "Your_channel_id";
-            NotificationChannel channel = new NotificationChannel(
-                    channelId,
-                    "Channel human readable title",
-                    NotificationManager.IMPORTANCE_DEFAULT);
-        assert notificationmanager != null;
-        notificationmanager.createNotificationChannel(channel);
-            builder.setChannelId(channelId);
-        notificationmanager.notify(1, builder.build());
+        this.context = context;
+        // intent로부터 전달받은 string
+        String get_yout_string = intent.getExtras().getString("state");
+        // RingtonePlayingService 서비스 intent 생성
+        Intent service_intent = new Intent(context, serviceD.class);
+
+        // RingtonePlayinService로 extra string값 보내기
+        service_intent.putExtra("state", get_yout_string);
+        service_intent.putExtra("hours",intent.getExtras().getString("hours"));
+        service_intent.putExtra("minutes",intent.getExtras().getString("minutes"));
+        service_intent.putExtra("ampm",intent.getExtras().getString("ampm"));
+        service_intent.putExtra("textline",intent.getExtras().getString("textline"));
+        // start the ringtone service
+
+       // if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+         //   this.context.startForegroundService(service_intent);
+       // }else{
+            this.context.startService(service_intent);
+        //}
+
+
 
     }
 }

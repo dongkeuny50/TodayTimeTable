@@ -3,9 +3,21 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
-    <color name="titlecolor">#227879</color>
-    <color name="tabcolor">#CBFCDD</color>
+    <color name="titlecolor">#E9DA7B</color>
+    <color name="tabcolor">#fff0ed</color>
+    <color name="tabtextcolor">#5272af</color>
+
+<color name="topcolor">#4f6bb6</color>
+    <color name="topcolor2">#425397</color>
+    <color name="buttons">#f74775</color>
+<color name="cellcolor">#e9f2f7</color>
+    <color name="cellcolortextline">#fff0ed</color>
+
+    <color name="circlecolor">#ffe600</color>
+    <color name="sunsetcolor">#e08700</color>
+    <color name="eveningcolor">#425397</color>
 
     <color name="graycolor">#F0F0F0</color>
-
+<color name="top">#f0fff4</color>
+    <color name="bottom">#fffff4</color>
 </resources>

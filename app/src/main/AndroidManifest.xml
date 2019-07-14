@@ -3,6 +3,8 @@
     package="com.example.todaytimetable">
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,8 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".ui.main.serviceD"
-            />
+        <service android:name=".ui.main.serviceD"/>
         <receiver android:name=".ui.main.broadcastD"/>
     </application>
 

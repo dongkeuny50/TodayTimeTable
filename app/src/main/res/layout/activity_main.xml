@@ -26,18 +26,23 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
-            app:tabTextColor="@color/titlecolor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/tabcolor" />
+            android:background="@color/tabcolor"
+            app:tabIndicatorColor="#f74775"
+            app:tabTextColor="#f74775" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-<!--
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" >
+
+    </androidx.viewpager.widget.ViewPager>
+
+
+    <!--
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"

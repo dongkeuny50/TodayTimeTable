@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -40,6 +41,7 @@ import org.w3c.dom.Text;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Objects;
 
@@ -65,14 +67,79 @@ public class PlaceholderFragment extends Fragment {
     RecyclerView recyclerView;
     recyclerview adapter;
 
+
     static PlaceholderFragment newInstance(int index) {
         PlaceholderFragment fragment = new PlaceholderFragment();
         return fragment;
     }
     @Override
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pageViewModel = ViewModelProviders.of(getActivity()).get(PageViewModel.class);
+
+        pageViewModel.getdate.observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                date = s;
+            }
+        });//오늘날짜
+        pageViewModel.getlists.observe(this, new Observer<ArrayList<String>>() {
+            @Override
+            public void onChanged(ArrayList<String> strings) {//오늘시간표
+                strarray = strings;
+                if(strarray != null){
+                    list.clear();
+                    adapter.notifyDataSetChanged();
+
+                    list= new ArrayList<>();
+                    recyclerView.setLayoutManager(new LinearLayoutManager(root.getContext())) ;
+                    adapter = new recyclerview(list) ;
+                    recyclerView.setAdapter(adapter) ;
+                    hm = strarray;
+                    for(int i=0;i<hm.size()/4;i++) {
+                        list.add("");
+                        adapter.notifyItemInserted(list.size());
+                    }
+                    apm = "";
+                    jh = "";
+                    jm = "";
+                    jt = "";
+                    recyclerView.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (int i = 0; i < list.size(); i++) {
+                                RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder)
+                                        recyclerView.findViewHolderForAdapterPosition(i);
+                                if (null != holder) {
+                                    holder.itemView.setVisibility(View.VISIBLE);
+                                    holder.itemView.findViewById(R.id.ampm).setVisibility(View.VISIBLE);
+                                    holder.itemView.findViewById(R.id.time).setVisibility(View.VISIBLE);
+                                    holder.itemView.findViewById(R.id.minute).setVisibility(View.VISIBLE);
+                                    holder.itemView.findViewById(R.id.textlines).setVisibility(View.VISIBLE);
+                                    View view = holder.itemView;
+                                    TextView ampm = view.findViewById(R.id.ampm);
+                                    EditText hour = view.findViewById(R.id.time);
+                                    EditText minute = view.findViewById(R.id.minute);
+                                    EditText textinput = view.findViewById(R.id.textlines);
+                                    apm = hm.get( i * 4);
+                                    jh = hm.get(i * 4 + 1);
+                                    jm = hm.get(i * 4 + 2);
+                                    jt = hm.get(i * 4 + 3);
+                                    ampm.setText(apm);
+                                    hour.setText(jh);
+                                    minute.setText(jm);
+                                    textinput.setText(jt);
+                                }}
+
+                        }
+                    },100);
+
+
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
 
 
     }
@@ -159,7 +226,7 @@ public class PlaceholderFragment extends Fragment {
 
                         ArrayList<String> lists = new ArrayList<String>();
                         final String[] savedString = new String[1];
-                        if(date == "") {
+                        if(date.equals("")) {
                             @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d");
                             Date date = new Date(System.currentTimeMillis());
                             getTime = sdf.format(date);
@@ -208,6 +275,7 @@ public class PlaceholderFragment extends Fragment {
 
                         @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d");
                         Date date = new Date(System.currentTimeMillis());
+                        ((MainActivity)getActivity()).refreshview();
 
 
                     }
@@ -217,69 +285,8 @@ public class PlaceholderFragment extends Fragment {
 
         });
 
-        pageViewModel.getdate.observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                date = s;
-            }
-        });//오늘날짜
-        pageViewModel.getlists.observe(this, new Observer<ArrayList<String>>() {
-            @Override
-            public void onChanged(ArrayList<String> strings) {//오늘시간표
-                strarray = strings;
-                if(strarray != null){
-                    list.clear();
-                    adapter.notifyDataSetChanged();
 
-                    list= new ArrayList<>();
-                    recyclerView.setLayoutManager(new LinearLayoutManager(root.getContext())) ;
-                    adapter = new recyclerview(list) ;
-                    recyclerView.setAdapter(adapter) ;
-                    hm = strarray;
-                    for(int i=0;i<hm.size()/4;i++) {
-                        list.add("");
-                        adapter.notifyItemInserted(list.size());
-                    }
-apm = "";
-                    jh = "";
-                    jm = "";
-                    jt = "";
-                    recyclerView.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (int i = 0; i < list.size(); i++) {
-                                RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder)
-                                        recyclerView.findViewHolderForAdapterPosition(i);
-                                if (null != holder) {
-                                    holder.itemView.setVisibility(View.VISIBLE);
-                                    holder.itemView.findViewById(R.id.ampm).setVisibility(View.VISIBLE);
-                                    holder.itemView.findViewById(R.id.time).setVisibility(View.VISIBLE);
-                                    holder.itemView.findViewById(R.id.minute).setVisibility(View.VISIBLE);
-                                    holder.itemView.findViewById(R.id.textlines).setVisibility(View.VISIBLE);
-                                    View view = holder.itemView;
-                                    TextView ampm = view.findViewById(R.id.ampm);
-                                    EditText hour = view.findViewById(R.id.time);
-                                    EditText minute = view.findViewById(R.id.minute);
-                                    EditText textinput = view.findViewById(R.id.textlines);
-                                    apm = hm.get( i * 4);
-                                    jh = hm.get(i * 4 + 1);
-                                    jm = hm.get(i * 4 + 2);
-                                    jt = hm.get(i * 4 + 3);
-                                    ampm.setText(apm);
-                                    hour.setText(jh);
-                                    minute.setText(jm);
-                                    textinput.setText(jt);
-                                }}
-
-                        }
-                    },100);
-
-
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        });
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             public boolean onMove(RecyclerView recyclerView,
                                   RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
 //                    final int fromPos = viewHolder.getAdapterPosition();
@@ -289,14 +296,45 @@ apm = "";
             }
 
             @Override
+            public void onMoved(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, int fromPos, @NonNull RecyclerView.ViewHolder target, int toPos, int x, int y) {
+                Collections.swap(list, fromPos, toPos);
+                adapter.notifyItemMoved(fromPos,toPos);
+            }
+
+            @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 //Remove swiped item from list and notify the RecyclerView
-                list.remove(viewHolder.getLayoutPosition());
-                adapter.notifyItemRemoved(viewHolder.getLayoutPosition());
+
+                int position = viewHolder.getAdapterPosition();
+                RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder)
+                        recyclerView.findViewHolderForAdapterPosition(position);
+                if (null != holder) {
+                    holder.itemView.setVisibility(View.VISIBLE);
+                    holder.itemView.findViewById(R.id.ampm).setVisibility(View.VISIBLE);
+                    holder.itemView.findViewById(R.id.time).setVisibility(View.VISIBLE);
+                    holder.itemView.findViewById(R.id.minute).setVisibility(View.VISIBLE);
+                    holder.itemView.findViewById(R.id.textlines).setVisibility(View.VISIBLE);
+                    View view = holder.itemView;
+                    TextView ampm = view.findViewById(R.id.ampm);
+                    EditText hour = view.findViewById(R.id.time);
+                    EditText minute = view.findViewById(R.id.minute);
+                    EditText textinput = view.findViewById(R.id.textlines);
+                    ampm.setText("");
+                    hour.setText("");
+                    minute.setText("");
+                    textinput.setText("");
+                }
+                list.remove(position);
+                adapter.notifyItemRangeRemoved(position,  1);
+
+                Log.d("yes", "onSwiped: deleted"+list.size());
             }
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
         return root;
     }
+
+
 }
+

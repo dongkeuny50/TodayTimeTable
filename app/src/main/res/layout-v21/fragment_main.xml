@@ -14,7 +14,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/LinearLayoutDelete"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:background="@drawable/saylormoon_top1"
         android:orientation="horizontal"
@@ -28,7 +28,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:background="@drawable/savebuttons"
+            android:background="@drawable/savebutton"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/text_delete"
@@ -54,7 +54,6 @@
             android:layout_height="70dp"
             android:layout_gravity="center"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:background="@drawable/alldelete"
@@ -83,7 +82,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_weight="14"
         android:scrollbars="vertical">
 
@@ -92,7 +91,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/LinearLayoutSave"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
+        android:layout_height="30dp"
         android:layout_weight="1"
         android:background="@color/topcolor2"
         android:weightSum="2">

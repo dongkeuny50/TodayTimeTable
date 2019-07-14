@@ -7,6 +7,7 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import com.example.todaytimetable.R;
 
@@ -15,6 +16,7 @@ import com.example.todaytimetable.R;
  * one of the sections/tabs/pages.
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
 
     @StringRes
     private static final int[] TAB_TITLES = new int[]{R.string.timetable, R.string.repository,R.string.setting};
@@ -40,6 +42,17 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return null;
         }
     }
+    @Override
+    public int getItemPosition(Object object){
+        if(object.getClass() == PlaceholderFragment_rep.class){
+            return POSITION_NONE;
+        }
+        else{
+            return super.getItemPosition(object);
+
+            }
+
+    }
 
     @Nullable
     @Override
@@ -52,4 +65,5 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         // Show 3 total pages.
         return 3;
     }
+
 }
