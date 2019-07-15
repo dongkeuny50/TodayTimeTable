@@ -31,7 +31,7 @@ public class PlaceholderFragment_setting extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        pageViewModel = ViewModelProviders.of(this).get(PageViewModel.class);
+        pageViewModel = ViewModelProviders.of(getActivity()).get(PageViewModel.class);
     }
 
     @Override

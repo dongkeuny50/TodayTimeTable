@@ -210,10 +210,11 @@ View view;
                     intent.putExtra("ampm",strampm);
                     intent.putExtra("textline",strtextline);
                     intent.putExtra("state","alarm on");
-                    if(ampm.getText().toString().equals("오후")){if(Integer.parseInt(String.valueOf(hour.getText())) != 12){ampmplus = 12;}
-                     }
-                    if(ampm.getText().toString().equals("오전")){if(Integer.parseInt(String.valueOf(hour.getText())) == 12){ampmplus = -12;} }
-                    try{
+
+                    try{if(ampm.getText().toString().equals("오후")){if(Integer.parseInt(String.valueOf(hour.getText())) != 12){ampmplus = 12;}
+                    }
+
+                    else if(ampm.getText().toString().equals("오전")){if(Integer.parseInt(String.valueOf(hour.getText())) == 12){ampmplus = -12;} }
                     hours = Integer.parseInt(String.valueOf(hour.getText()))+ampmplus;
                     minutes = Integer.parseInt(String.valueOf(minute.getText()));
                         PendingIntent sender = PendingIntent.getBroadcast(view.getContext(), num, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -260,6 +261,7 @@ View view;
             am.cancel(sender);
             sender.cancel();}
         Log.d(TAG, "onCheckedChanged: "+num);
+
         super.onViewDetachedFromWindow(holder);
     }
 

@@ -36,6 +36,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.todaytimetable.MainActivity;
 import com.example.todaytimetable.R;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.lang.reflect.Array;
@@ -301,6 +304,7 @@ recyclerView.setHasFixedSize(true);
                 adapter.notifyItemMoved(fromPos,toPos);
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 //Remove swiped item from list and notify the RecyclerView
@@ -323,6 +327,7 @@ recyclerView.setHasFixedSize(true);
                     hour.setText("");
                     minute.setText("");
                     textinput.setText("");
+                    ampm.setBackgroundTintList(root.getContext().getResources().getColorStateList(R.color.circlecolor));
                 }
                 list.remove(position);
                 adapter.notifyItemRangeRemoved(position,  1);
@@ -332,6 +337,106 @@ recyclerView.setHasFixedSize(true);
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+        ArrayList<String> hmt = new ArrayList<>();
+        try {
+            String finalword = "";
+            if(date.equals("")) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d");
+                Date date = new Date(System.currentTimeMillis());
+                finalword = sdf.format(date);
+            }
+            else{
+                finalword = date;}
+            String jhour = "";
+            String jminute = "";
+            String jtextline = "";
+            String japm = "";
+           String words = "";
+            SharedPreferences spf = root.getContext().getSharedPreferences("pref",MODE_PRIVATE);
+            words = spf.getString(finalword,"");
+
+            JSONArray jarray = new JSONArray(words); // JSONArray 생성
+            for(int i=0; i < jarray.length()-1; i++){
+
+                JSONObject jObject = jarray.getJSONObject(i);  // JSONObject 추출
+                japm = jObject.getString("ampm");
+                jhour = jObject.getString("hour");
+                jminute = jObject.getString("minute");
+                jtextline = jObject.getString("textlines");
+                hmt.add(japm);
+                hmt.add(jhour);
+                hmt.add(jminute);
+                hmt.add(jtextline);
+
+
+
+
+
+
+
+            }
+            strarray = hmt;
+            if(strarray != null){
+                list.clear();
+                adapter.notifyDataSetChanged();
+
+                list= new ArrayList<>();
+                recyclerView.setLayoutManager(new LinearLayoutManager(root.getContext())) ;
+                adapter = new recyclerview(list) ;
+                recyclerView.setAdapter(adapter) ;
+                hm = strarray;
+                for(int i=0;i<hm.size()/4;i++) {
+                    list.add("");
+                    adapter.notifyItemInserted(list.size());
+                }
+                apm = "";
+                jh = "";
+                jm = "";
+                jt = "";
+                recyclerView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < list.size(); i++) {
+                            RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder)
+                                    recyclerView.findViewHolderForAdapterPosition(i);
+                            if (null != holder) {
+                                holder.itemView.setVisibility(View.VISIBLE);
+                                holder.itemView.findViewById(R.id.ampm).setVisibility(View.VISIBLE);
+                                holder.itemView.findViewById(R.id.time).setVisibility(View.VISIBLE);
+                                holder.itemView.findViewById(R.id.minute).setVisibility(View.VISIBLE);
+                                holder.itemView.findViewById(R.id.textlines).setVisibility(View.VISIBLE);
+                                View view = holder.itemView;
+                                TextView ampm = view.findViewById(R.id.ampm);
+                                EditText hour = view.findViewById(R.id.time);
+                                EditText minute = view.findViewById(R.id.minute);
+                                EditText textinput = view.findViewById(R.id.textlines);
+                                apm = hm.get( i * 4);
+                                jh = hm.get(i * 4 + 1);
+                                jm = hm.get(i * 4 + 2);
+                                jt = hm.get(i * 4 + 3);
+                                ampm.setText(apm);
+                                hour.setText(jh);
+                                minute.setText(jm);
+                                textinput.setText(jt);
+                            }}
+
+                    }
+                },100);
+
+
+                adapter.notifyDataSetChanged();
+            }
+
+
+
+
+
+
+        }
+            catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         return root;
     }
 
